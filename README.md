@@ -8,11 +8,11 @@ AI Agent Factory lets users configure agents with their own instructions, tools 
 
 ## Architecture
 
-An agent's settings determine its system prompt, available tools and document sources. The backend loads those settings and builds a LangGraph execution graph. The model can answer directly or call a tool, read the result and continue.
+Agent Studio runs the chat agent and its tools. RAG Studio prepares document collections and searches them. Both studios use the same FastAPI backend.
 
-![Agent configuration stored through FastAPI and PostgreSQL supplies the instructions and tools for a LangGraph model and tool execution loop. Collection tools connect the agent to RAG Studio.](assets/system-architecture.svg)
+![The web app connects to a shared FastAPI backend for Agent Studio and RAG Studio. The backend uses OpenAI and PostgreSQL with pgvector.](assets/platform-overview.svg)
 
-**Figure 1.** Agent configuration, tool binding and LangGraph execution. Collection-specific tools delegate retrieval to RAG Studio. [Agent framework](docs/agent-framework.md).
+**Figure 1.** The backend handles model and database access for both studios. [Agent framework](docs/agent-framework.md).
 
 ## My work
 
@@ -24,13 +24,11 @@ On the execution side, I worked on the LangGraph model/tool loop, tool selection
 
 ### Connecting Agent Studio to RAG Studio
 
-The two studios had different jobs: RAG Studio processed documents and retrieved context; Agent Studio managed agents and their conversations. I connected them by wrapping retrieval as a **LangChain tool for each configured collection**. Each wrapper kept the collection and selected retrieval method together, then passed the model's query to RAG Studio.
+I gave the agent one search tool for each configured collection. I used collection and file descriptions to tell the model what it could find there. Each tool calls the retrieval method saved for its collection.
 
-![A collection binding supplies a callable retrieval tool. Its description helps the model choose a source; the wrapper sends the query to the selected RAG method and returns document context.](assets/collection-retrieval.svg)
+![RAG Studio prepares documents for search. During chat, Agent Studio uses a collection tool to search the same documents and receive relevant text.](assets/studio-connection.svg)
 
-**Figure 2.** Collection-specific tool construction and retrieval. The collection and method stay bound to the wrapper; ToolNode adds the retrieved context to the conversation as a ToolMessage. [RAG integration](docs/rag-integration.md).
-
-I added collection and file descriptions to help the model choose where to search. Retrieval stayed in RAG Studio, while the agent used the returned text in the same execution loop as its other tool results.
+**Figure 2.** RAG Studio prepares the collection (top). During chat, Agent Studio sends a query through its tool and receives the matching text (bottom). [RAG integration](docs/rag-integration.md).
 
 ### Tools, ratings and API tests
 

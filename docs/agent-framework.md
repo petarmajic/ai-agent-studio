@@ -4,6 +4,8 @@
 
 Agent Studio connects an agent's saved settings to its behaviour in a conversation. I worked on the project and agent APIs, the database models and the integration that builds a LangGraph agent from those settings.
 
+![The web app connects to a shared FastAPI backend for Agent Studio and RAG Studio. The backend uses OpenAI and PostgreSQL with pgvector.](../assets/platform-overview.svg)
+
 ## Data model
 
 A project groups agents and document collections. Each agent stores its instructions and selected static tools. A separate configuration record links the agent to a collection and the retrieval method it should use for that collection.
@@ -20,8 +22,6 @@ I implemented CRUD routes, request and response schemas, database operations and
 The backend uses FastAPI and Pydantic for the API layer, with SQLAlchemy and PostgreSQL for persistence. Document processing, chunk storage and vector retrieval are handled by RAG Studio.
 
 ## Building the agent
-
-![Stored agent settings supply the system prompt and tool set for the LangGraph execution loop](../assets/system-architecture.svg)
 
 When a chat request arrives, the backend loads the agent's description, selected static tools and collection configurations. The description becomes the system prompt. The selected static tools are combined with the collection-specific RAG tools and bound to the language model.
 
