@@ -1,4 +1,4 @@
-# AI Agent Factory — Agent Studio
+# AI Agent Factory (Agent Studio)
 
 AI Agent Factory lets users choose what an agent can do and which documents it can search. During my internship at Abysalto AI Academy, I built the **project and agent APIs** and connected **Agent Studio** to **RAG Studio** so an agent could look up documents during a chat. I also built the weather tool and the API that lets users see which tools they can assign to an agent.
 
