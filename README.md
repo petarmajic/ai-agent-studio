@@ -1,6 +1,6 @@
 # AI Agent Factory — Agent Studio
 
-AI Agent Factory lets users choose what an agent can do and which documents it can search. During my internship at Abysalto AI Academy, I built the **project and agent APIs** and connected **Agent Studio** to **RAG Studio** so an agent could look up documents during a chat.
+AI Agent Factory lets users choose what an agent can do and which documents it can search. During my internship at Abysalto AI Academy, I built the **project and agent APIs** and connected **Agent Studio** to **RAG Studio** so an agent could look up documents during a chat. I also built the weather tool and the API that lets users see which tools they can assign to an agent.
 
 **Python · FastAPI · Pydantic · SQLAlchemy · PostgreSQL · LangGraph · LangChain · pytest**
 
@@ -30,9 +30,11 @@ The integration had to preserve two choices: which collection to search and how 
 
 **Figure 2.** RAG Studio prepares the collection (top). In a chat, the agent searches that collection through its tool and gets matching text back (bottom). [RAG integration](docs/rag-integration.md).
 
-### Tools, ratings and API tests
+### Tools an agent can use
 
-I integrated the weather tool through our common tool interface and added the API that lists static tools for agent configuration. The team also built tools for Jira, email over SMTP and public holidays.
+A user can ask for the weather by city name. My tool looks up the city’s coordinates in Open-Meteo, then returns the current temperature and wind speed. The backend binds only the tools selected for that agent. Using the same interface, the team added tools that create a Jira ticket and return its link, send email through Gmail SMTP, or look up Croatian public holidays. [Tool interface and examples](docs/agent-framework.md#tool-interface).
+
+### Ratings and API tests
 
 I changed how the backend stores user ratings: it keeps the sum and count, so a 5 followed by a 1 gives an average of 3.0. That calculation is one of the **14 router test cases** I wrote for agents and projects. The others cover operations such as updating an agent, rejecting a duplicate project name and looking up a deleted record. [Ratings and test coverage](docs/testing-and-ratings.md).
 
