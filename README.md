@@ -10,7 +10,7 @@ AI Agent Factory lets users configure agents with their own instructions, tools 
 
 An agent's settings determine its system prompt, available tools and document sources. The backend loads those settings and builds a LangGraph execution graph. The model can answer directly or call a tool, read the result and continue.
 
-![Agent configuration stored through FastAPI and PostgreSQL supplies the instructions and tools for a LangGraph model and tool execution loop. Collection tools connect the agent to RAG Studio.](assets/architecture.svg)
+![Agent configuration stored through FastAPI and PostgreSQL supplies the instructions and tools for a LangGraph model and tool execution loop. Collection tools connect the agent to RAG Studio.](assets/agent-runtime.svg)
 
 **Figure 1.** How agent configuration becomes an executable agent. The return path carries tool results back into the conversation. [Agent framework](docs/agent-framework.md).
 
@@ -26,7 +26,7 @@ On the execution side, I worked on the LangGraph model/tool loop, tool selection
 
 The two studios had different jobs: RAG Studio processed documents and retrieved context; Agent Studio managed agents and their conversations. I connected them by wrapping retrieval as a **LangChain tool for each configured collection**. Each wrapper kept the collection and selected retrieval method together, then passed the model's query to RAG Studio.
 
-![A collection binding supplies a callable retrieval tool. Its description helps the model choose a source; the wrapper sends the query to the selected RAG method and returns document context.](assets/rag-tool-bridge.svg)
+![A collection binding supplies a callable retrieval tool. Its description helps the model choose a source; the wrapper sends the query to the selected RAG method and returns document context.](assets/rag-integration.svg)
 
 **Figure 2.** A document collection exposed through the agent's tool interface. The model sees a tool description; the wrapper keeps the collection and retrieval method attached to the call. [RAG integration](docs/rag-integration.md).
 

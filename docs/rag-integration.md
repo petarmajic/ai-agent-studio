@@ -8,7 +8,7 @@ RAG Studio stored document collections and provided the methods for searching th
 
 An agent can use several document collections, each with its own selected retrieval method. I worked on the configuration that records these choices and the mapping used to build the agent's tools. Each binding contains an **agent ID, collection ID and retrieval-method ID**.
 
-![A stored collection binding becomes a callable tool, which carries the selected source and method into retrieval and returns context to the model](../assets/rag-tool-bridge.svg)
+![A stored collection binding becomes a callable tool, which carries the selected source and method into retrieval and returns context to the model](../assets/rag-integration.svg)
 
 The wrapper holds onto the collection and method while exposing a callable tool to the model. When a query arrives, it passes the query to that method for that collection. The agent runtime can use the result without implementing the retrieval algorithm itself.
 
