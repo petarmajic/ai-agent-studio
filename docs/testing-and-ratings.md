@@ -2,25 +2,22 @@
 
 [Overview](../README.md) · [Agent framework](agent-framework.md)
 
-My work included average user ratings for agents and test cases for the Agent and Project APIs. The team platform also had a separate LLM-based evaluation path for agent conversations.
+I worked on agent rating calculations and wrote tests for the Agent and Project APIs. The ratings captured user feedback; the tests checked API responses and changes to stored records.
 
 ## Average user rating
 
-Each submitted rating contributes to a stored **sum** and **count**. The displayed average is the sum divided by the count. I changed the model and route behaviour to retain these aggregates and store the average as a floating-point value.
+I changed the rating model and routes to keep a cumulative sum and count of submitted scores. The average is stored as a floating-point value and updated when a new score arrives.
 
-For example, ratings of 5 and 1 produce a sum of 6, a count of 2 and an average of 3.0. This is also the aggregation case exercised by the Agent router tests.
+| User submissions | Rating sum | Rating count | Average |
+| --- | --- | --- | --- |
+| First score: 5 | 5 | 1 | 5.0 |
+| Next score: 1 | 6 | 2 | 3.0 |
 
-| Stored value | Role |
-| --- | --- |
-| Rating sum | Retains the total of submitted user scores. |
-| Rating count | Retains the number of submitted scores. |
-| Average rating | Exposes the aggregate score for the agent. |
-
-This is a user-feedback measure. It does not represent measured task accuracy or retrieval precision.
+This example is also covered by the Agent router tests. Keeping both aggregates means a new submission contributes to the existing feedback rather than replacing the previous score. The resulting average describes user ratings of an agent.
 
 ## Router tests
 
-I added **14 test cases** using the FastAPI TestClient and pytest: seven for agents and seven for projects.
+I added **14 test cases** with pytest and FastAPI TestClient: seven for agents and seven for projects.
 
 | Agent API | Project API |
 | --- | --- |
@@ -32,12 +29,12 @@ I added **14 test cases** using the FastAPI TestClient and pytest: seven for age
 | Retrieve the aggregate rating. | Update a project. |
 | Delete an agent and check subsequent lookup. | Delete a project and check subsequent lookup. |
 
-The tests exercise HTTP responses and persisted behaviour across the project and agent lifecycle. They are distinct from the shared RAG evaluation tests and any measurement of model answer quality.
+The cases follow the records through creation, changes and deletion. They also check error responses and the rating calculation, so the coverage includes more than successful create and read requests.
 
-## Shared conversation evaluation
+## Conversation evaluation
 
-The shared backend extracts tool calls and their results from the conversation trace. Its evaluation path can ask an LLM to score tool choice, tool use and the final answer on a 1–5 rubric, with a heuristic fallback.
+Other team members developed an LLM-based evaluation path for agent conversations. It reads the tool calls, tool results and final answer, then scores tool choice, tool use and the answer on a 1–5 rubric, with a heuristic fallback.
 
-That evaluation was a team contribution. It is separate from my user-rating aggregation and Agent/Project test cases. Neither a user-rating average nor an LLM judge score is a benchmark accuracy percentage.
+That evaluation measures a different part of the system from the user-rating average and API tests described here. It reviews conversation behaviour; the router tests check application behaviour and persistence.
 
 [RAG integration](rag-integration.md) · [Overview](../README.md)

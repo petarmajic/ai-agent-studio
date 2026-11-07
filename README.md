@@ -1,62 +1,59 @@
 # AI Agent Factory — Agent Studio
 
-Users could configure an AI agent with its own instructions, tools and document collections, then test it in a chat interface. I worked on the **Agent Studio backend** and the integration that exposed **RAG Studio retrieval as tools the agent could call**.
+AI Agent Factory lets users configure agents with their own instructions, tools and document collections, then test them in a chat interface. I worked on the **Agent Studio backend** during Abysalto AI Academy. My main integration connected it to **RAG Studio**, so an agent could search its configured document sources during a conversation.
 
-**Python · FastAPI · SQLAlchemy · PostgreSQL · LangGraph · LangChain · API testing**
+**Python · FastAPI · Pydantic · SQLAlchemy · PostgreSQL · LangGraph · LangChain · pytest**
 
 *Abysalto AI Academy · Summer 2025 · Six interns in two teams*
 
 ## Architecture
 
-The backend stores each agent's configuration and uses it to build the execution graph for a conversation. The model can answer directly or call a configured tool, read its result and continue.
+An agent's settings determine its system prompt, available tools and document sources. The backend loads those settings and builds a LangGraph execution graph. The model can answer directly or call a tool, read the result and continue.
 
-![Agent Studio configuration flows through FastAPI and persisted agent records into a LangGraph model-and-tool loop; collection-specific RAG tools connect that loop to the shared RAG Studio](assets/architecture.svg)
+![Agent configuration stored through FastAPI and PostgreSQL supplies the instructions and tools for a LangGraph model and tool execution loop. Collection tools connect the agent to RAG Studio.](assets/architecture.svg)
 
-**Figure 1.** Configuration, persistence and execution in the shared platform. Blue outlines mark the areas of my contributions. Retrieval methods, document processing and external integrations sit behind the tool interfaces. [Agent framework and data model](docs/agent-framework.md).
+**Figure 1.** How agent configuration becomes an executable agent. The return path carries tool results back into the conversation. [Agent framework](docs/agent-framework.md).
 
-## What I worked on
+## My work
 
-| Area | My contribution |
-| --- | --- |
-| **Project and agent APIs** | Implemented CRUD routes, request/response schemas and data operations for projects and agents. |
-| **Persistence and configuration** | Worked on SQLAlchemy models and the records connecting an agent, a document collection and its selected retrieval method. Added configuration routes and later refactored the model and API logic. |
-| **Agent execution** | Developed the LangGraph agent/tool integration, selected tools from agent configuration and used the agent description as its system prompt. Worked on chat handling and thread-related fixes. |
-| **RAG Studio integration** | Connected stored collection configurations to retrieval methods and wrapped collection retrieval as LangChain tools. Enriched tool descriptions with collection and document information so the model could choose among the configured sources. |
-| **Tool interface** | Worked on the common tool abstraction, weather-tool integration and the API exposing available static tools. The shared platform also included Jira, email and public-holiday tools. |
-| **Ratings and tests** | Added cumulative rating sums and counts for average user ratings. Wrote 14 Agent and Project router test cases covering creation, lookup, updates, deletion, error responses and rating behaviour. |
+### Agent configuration and execution
 
-## Connecting the two studios
+I built CRUD APIs for projects and agents, including the Pydantic schemas, SQLAlchemy models and database operations behind them. I also worked on the configuration records linking an agent to a document collection and its selected retrieval method. Those relationships let each agent keep its own document sources and search settings.
 
-The integration had to preserve both the **document source** and the **retrieval method** selected for an agent. A generic search function would not carry enough information to make that choice.
+On the execution side, I worked on the LangGraph model/tool loop, tool selection and chat handling. I used the agent description as its system prompt and loaded the selected tools from its configuration. This let users change an agent's instructions and capabilities through the application.
 
-![Stored agent-to-collection bindings become separate callable RAG tools with descriptions and input parameters, which dispatch queries to the configured retrieval method and return document context to the agent](assets/rag-tool-bridge.svg)
+### Connecting Agent Studio to RAG Studio
 
-**Figure 2.** The RAG tool bridge. Each configured collection becomes an agent-callable tool. The wrapper delegates retrieval to RAG Studio and returns the retrieved context to the model. [Configuration, tool descriptions and retrieval dispatch](docs/rag-integration.md).
+The two studios had different jobs: RAG Studio processed documents and retrieved context; Agent Studio managed agents and their conversations. I connected them by wrapping retrieval as a **LangChain tool for each configured collection**. Each wrapper kept the collection and selected retrieval method together, then passed the model's query to RAG Studio.
 
-This kept retrieval implementations in RAG Studio while letting Agent Studio use them through the same calling interface as its other tools.
+![A collection binding supplies a callable retrieval tool. Its description helps the model choose a source; the wrapper sends the query to the selected RAG method and returns document context.](assets/rag-tool-bridge.svg)
+
+**Figure 2.** A document collection exposed through the agent's tool interface. The model sees a tool description; the wrapper keeps the collection and retrieval method attached to the call. [RAG integration](docs/rag-integration.md).
+
+I added collection and file descriptions to help the model choose where to search. Retrieval stayed in RAG Studio, while the agent used the returned text in the same execution loop as its other tool results.
+
+### Tools, ratings and API tests
+
+I worked on the common tool interface, integrated the weather tool and added an API for listing available static tools. The team's tool catalogue also included Jira, SMTP email and public-holiday information.
+
+For agent feedback, I added cumulative rating sums and counts so each submitted score contributed to the average. I also wrote **14 router test cases** for the Agent and Project APIs, covering CRUD operations, missing records, duplicate project names and rating calculations. The platform's LLM-based conversation evaluation was developed by other team members. [Ratings and test coverage](docs/testing-and-ratings.md).
 
 ## Agent Playground
 
-![Agent Playground from the team's presentation, showing a conversation with a configured agent](assets/agent-playground.jpg)
+![The team's Agent Playground showing a conversation with a configured agent](assets/agent-playground.jpg)
 
-**Figure 3.** The shared application's chat interface. My work described here concerns the backend. Image from the team presentation, also published in the [RAG Studio project overview](https://github.com/roko-cubric/AI-Agent-RAG-Platform).
+**Figure 3.** The shared application's chat interface. Image from the team presentation, also published in [Roko Čubrić's project overview](https://github.com/roko-cubric/AI-Agent-RAG-Platform).
 
-## Ratings and testing
+## Team
 
-User ratings are stored as a sum and count, with their average updated after each submitted score. The Agent router tests cover that aggregation alongside CRUD behaviour; the Project tests cover creation, duplicate handling, lookup, update and deletion.
-
-The shared platform also included LLM-based scoring of agent conversations and tool traces. That is separate from the user-rating aggregation and router tests described as my work. [Rating model and test coverage](docs/testing-and-ratings.md).
-
-## Team and scope
-
-Six interns worked in two groups of three. **RAG Studio** handled document processing and retrieval. **Agent Studio**, my team, handled agent configuration, execution and interaction with tools. Connecting the studios required coordination around collection configuration, retrieval interfaces and the context passed back to the agent.
+Six interns worked in two teams of three. I was part of **Agent Studio**, which covered agent configuration, execution and tool use. The **RAG Studio** team developed document processing and retrieval. My integration work connected the two through collection configuration and callable retrieval tools.
 
 ## Repository guide
 
 | Guide | Contents |
 | --- | --- |
-| [Agent framework](docs/agent-framework.md) | Configuration, APIs, persisted relationships and the model/tool execution loop. |
-| [RAG integration](docs/rag-integration.md) | How a configured collection and retrieval method become an agent-callable tool. |
-| [Testing and ratings](docs/testing-and-ratings.md) | User-rating aggregation, API test cases and the distinction from shared LLM evaluation. |
+| [Agent framework](docs/agent-framework.md) | Data model, APIs and the LangGraph execution loop. |
+| [RAG integration](docs/rag-integration.md) | Collection bindings, tool descriptions and retrieval calls. |
+| [Ratings and API tests](docs/testing-and-ratings.md) | Rating calculations and the 14 router test cases. |
 
-*Source code belongs to Abysalto. This repository documents the architecture and my contributions.*
+*Source code belongs to Abysalto. This repository presents the architecture and my contributions.*

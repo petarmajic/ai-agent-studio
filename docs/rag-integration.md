@@ -2,44 +2,41 @@
 
 [Overview](../README.md) · [Agent framework](agent-framework.md)
 
-RAG Studio provides document collections and retrieval methods. Agent Studio needs to expose the selected combinations as tools a model can call during a conversation. I worked on the stored configuration, the agent integration and the tool wrappers connecting these parts.
+RAG Studio stored document collections and provided the methods for searching them. My work connected those methods to Agent Studio, where the model needed to choose and call a document source during a conversation.
 
-## What the binding represents
+## Keeping the source and method together
 
-An agent's collection configuration links three things: **the agent, a collection and the retrieval method selected for that collection**. The same agent can therefore use several configured document sources. Each source keeps its own retrieval-method choice.
+An agent can use several document collections, each with its own selected retrieval method. I worked on the configuration that records these choices and the mapping used to build the agent's tools. Each binding contains an **agent ID, collection ID and retrieval-method ID**.
 
-![Agent configuration becomes separate retrieval tools, which dispatch to RAG Studio and return context to the model](../assets/rag-tool-bridge.svg)
+![A stored collection binding becomes a callable tool, which carries the selected source and method into retrieval and returns context to the model](../assets/rag-tool-bridge.svg)
 
-The configured collection and retrieval method stay associated from tool construction through retrieval dispatch.
+The wrapper holds onto the collection and method while exposing a callable tool to the model. When a query arrives, it passes the query to that method for that collection. The agent runtime can use the result without implementing the retrieval algorithm itself.
 
-## Building a callable retrieval tool
+## Giving the model enough information to choose
 
-| Step | Information carried forward | Purpose |
-| --- | --- | --- |
-| Read agent configuration | Collection reference and selected retrieval-method identifier. | Preserve the user's source and method choices. |
-| Load collection context | Collection name, description and available document descriptions. | Tell the model what information the tool can retrieve. |
-| Construct the wrapper | A distinct tool name, retrieval callable and description. | Expose collection retrieval through the agent's tool interface. |
-| Bind the tool set | Configured static tools plus collection-specific RAG tools. | Make document retrieval available during agent execution. |
-| Dispatch a call | Query, selected collection and method inputs. | Delegate retrieval to RAG Studio. |
-| Return context | Retrieved text associated with the requested collection. | Give the model context for its next response or tool decision. |
+A tool name identifies a callable operation, but the description tells the model when it might be useful. I worked on descriptions that included the collection's purpose and information about its files. This gave the model information about the available sources before it made a retrieval call.
 
-I added the agent-side collection-to-method mapping and integrated it with the configured tool set. I also worked on the wrappers and their descriptions, including collection and file information. The shared implementation later added method-specific parameter schemas and further service refactoring.
-
-## Why the tool description matters
-
-An agent may have more than one source available. The wrapper's description identifies the collection, explains the retrieval method and includes document information. This gives the model information for choosing a tool before retrieval has happened.
-
-The wrapper carries the selected collection into the retrieval call. It exposes that collection's retrieval capability without requiring the agent runtime to implement the retrieval algorithm itself.
-
-## Responsibility boundary
-
-| Agent Studio integration | Shared RAG Studio components |
+| Tool component | Purpose |
 | --- | --- |
-| Agent and collection configuration. | Document upload, chunking and embedding workflows. |
-| Selecting the configured collection/method combinations. | Retrieval-method implementations and their parameters. |
-| Constructing and exposing retrieval tools to the model. | Chunk storage and vector retrieval with PostgreSQL/pgvector. |
-| Returning retrieved context into the agent's execution loop. | Retrieving and preparing the requested document context. |
+| Distinct name | Identifies the collection-specific operation in a tool call. |
+| Collection and file descriptions | Explain what information the source contains. |
+| Retrieval-method description | Explains the search capability available for that source. |
+| Query and method inputs | Supply the search request to the wrapper. |
+| Bound collection and method | Preserve the source and retrieval choices stored for the agent. |
 
-My contribution was the connection between the studios and the agent execution path. The platform's retrieval algorithms were developed by the RAG Studio team.
+I integrated these retrieval tools with the agent's selected static tools and the LangGraph execution loop. The shared implementation later added method-specific parameter schemas and further service refactoring.
 
-[Agent framework](agent-framework.md) · [Testing and ratings](testing-and-ratings.md)
+## From a tool call to document context
+
+The model selects a tool and supplies its query. The wrapper calls the configured retrieval method, which reads from the collection's document data in RAG Studio. The returned text becomes a tool result in the conversation. The model can then use that context in its answer or make another tool call.
+
+The division of work followed the two studios:
+
+| Agent Studio — my integration | RAG Studio — retrieval team |
+| --- | --- |
+| Store an agent's collection and method choices. | Process documents, create chunks and generate embeddings. |
+| Build and describe collection-specific tools. | Implement retrieval methods and their parameters. |
+| Bind those tools to the agent model. | Store and retrieve document chunks with PostgreSQL/pgvector. |
+| Return retrieval results to the model/tool loop. | Prepare the document context requested by the tool. |
+
+[Agent framework](agent-framework.md) · [Ratings and API tests](testing-and-ratings.md)
