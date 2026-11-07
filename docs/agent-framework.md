@@ -21,7 +21,7 @@ The backend uses FastAPI and Pydantic for the API layer, with SQLAlchemy and Pos
 
 ## Building the agent
 
-![Stored agent settings supply the system prompt and tool set for the LangGraph execution loop](../assets/agent-runtime.svg)
+![Stored agent settings supply the system prompt and tool set for the LangGraph execution loop](../assets/system-architecture.svg)
 
 When a chat request arrives, the backend loads the agent's description, selected static tools and collection configurations. The description becomes the system prompt. The selected static tools are combined with the collection-specific RAG tools and bound to the language model.
 
