@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="228" viewBox="0 0 860 228" role="img" aria-labelledby="title desc">
+<title id="title">AI Agent Factory platform</title><desc id="desc">The web app connects to a shared FastAPI backend for Agent Studio and RAG Studio. The backend calls OpenAI and uses PostgreSQL with pgvector.</desc>
+<defs><marker id="head" viewBox="0 0 8 8" refX="6.4" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L7 4L0 8Z" fill="#70859a"/></marker></defs>
+<rect width="860" height="228" fill="#fff"/>
+<path d="M160 98H356" fill="none" stroke="#70859a" stroke-width="1.9" stroke-linejoin="round" marker-end="url(#head)" marker-start="url(#head)"/>
+<path d="M455 98H510Q524 98 524 84V61Q524 50 535 50H597" fill="none" stroke="#70859a" stroke-width="1.9" stroke-linejoin="round" marker-end="url(#head)" marker-start="url(#head)"/>
+<path d="M455 98H510Q524 98 524 112V159Q524 172 537 172H597" fill="none" stroke="#70859a" stroke-width="1.9" stroke-linejoin="round" marker-end="url(#head)" marker-start="url(#head)"/>
+<g transform="translate(112 98)"><path d="M-33 -23h66v44h-66z" fill="#edf4ff" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M-33 12h66 M0 21v10 M-15 31h30" fill="none" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+<text x="112" y="160" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="20" font-weight="600" fill="#203349">Web app</text><text x="112" y="183" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#52667b">Set up agents and chat</text>
+<g transform="translate(407 98)"><path d="M-30 -22h60v18h-60z M-30 4h60v18h-60z" fill="#edf4ff" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M-20 -13h3m8 0h19 M-20 13h3m8 0h19" fill="none" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+<text x="407" y="160" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="20" font-weight="600" fill="#203349">FastAPI backend</text>
+<text x="407" y="183" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#52667b">Agent Studio · RAG Studio</text>
+<g transform="translate(638 50)"><path d="M-20 -20h40v40h-40z" fill="#edf4ff" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M-10 -10h20v20h-20z M-11 -20v-7m11 7v-7m11 7v-7 M-11 20v7m11 -7v7m11 -7v7 M-20 -11h-7m7 11h-7m7 11h-7 M20 -11h7m-7 11h7m-7 11h7" fill="none" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+<text x="686" y="48" text-anchor="start" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="600" fill="#203349">OpenAI</text>
+<text x="686" y="70" text-anchor="start" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#52667b">Language model</text>
+<g transform="translate(638 172)"><path d="M-26 -16v32c0 12 52 12 52 0v-32" fill="#edf4ff" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M-26 -16c0 -13 52 -13 52 0s-52 13 -52 0z" fill="#edf4ff" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/><path d="M-26 0c0 13 52 13 52 0" fill="none" stroke="#245db5" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/></g>
+<text x="684" y="167" text-anchor="start" font-family="DejaVu Sans, Arial, sans-serif" font-size="19" font-weight="600" fill="#203349">PostgreSQL</text>
+<text x="684" y="189" text-anchor="start" font-family="DejaVu Sans, Arial, sans-serif" font-size="14" font-weight="400" fill="#52667b">Data and vector search</text>
+</svg>
