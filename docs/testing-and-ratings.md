@@ -2,22 +2,22 @@
 
 [Overview](../README.md) · [Agent framework](agent-framework.md)
 
-I worked on agent rating calculations and wrote tests for the Agent and Project APIs. The ratings captured user feedback; the tests checked API responses and changes to stored records.
+Users could rate an agent after a chat. I changed how the backend accumulated their scores and wrote tests for the Agent and Project APIs.
 
 ## Average user rating
 
-I changed the rating model and routes to keep a cumulative sum and count of submitted scores. The average is stored as a floating-point value and updated when a new score arrives.
+Each new score adds to the agent’s rating sum and increases its rating count by one. The route divides the updated sum by the count and stores the average as a floating-point value.
 
 | User submissions | Rating sum | Rating count | Average |
 | --- | --- | --- | --- |
 | First score: 5 | 5 | 1 | 5.0 |
 | Next score: 1 | 6 | 2 | 3.0 |
 
-This example is also covered by the Agent router tests. Keeping both aggregates means a new submission contributes to the existing feedback rather than replacing the previous score. The resulting average describes user ratings of an agent.
+The rating test submits those two scores in order and checks that the second response contains 3.0. A separate test reads the rating back through the API.
 
 ## Router tests
 
-I added **14 test cases** with pytest and FastAPI TestClient: seven for agents and seven for projects.
+I wrote **14 router test cases** using pytest and FastAPI’s TestClient: seven for agents and seven for projects.
 
 | Agent API | Project API |
 | --- | --- |
@@ -29,12 +29,12 @@ I added **14 test cases** with pytest and FastAPI TestClient: seven for agents a
 | Retrieve the aggregate rating. | Update a project. |
 | Delete an agent and check subsequent lookup. | Delete a project and check subsequent lookup. |
 
-The cases follow the records through creation, changes and deletion. They also check error responses and the rating calculation, so the coverage includes more than successful create and read requests.
+The deletion tests make two requests: first they delete the record, then they try to fetch it by ID. The second request must return 404.
 
 ## Conversation evaluation
 
-Other team members developed an LLM-based evaluation path for agent conversations. It reads the tool calls, tool results and final answer, then scores tool choice, tool use and the answer on a 1–5 rubric, with a heuristic fallback.
+Other team members built a separate evaluation for conversations. It reads the tool calls, their results and the final answer. An LLM scores the conversation on a 1–5 rubric for tool choice, tool use and answer quality. The evaluator also has a heuristic fallback.
 
-That evaluation measures a different part of the system from the user-rating average and API tests described here. It reviews conversation behaviour; the router tests check application behaviour and persistence.
+A user rating records what someone thought of an agent. The conversation evaluator scores a particular exchange, and the router tests check that the API returns the expected responses.
 
 [RAG integration](rag-integration.md) · [Overview](../README.md)

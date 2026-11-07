@@ -2,19 +2,19 @@
 
 [Overview](../README.md) · [Agent framework](agent-framework.md)
 
-RAG Studio stored document collections and provided the methods for searching them. My work connected those methods to Agent Studio, where the model needed to choose and call a document source during a conversation.
+RAG Studio already knew how to search a document collection. My job was to let a chat agent call that search with the collection and retrieval method its user had chosen.
 
 ## Keeping the source and method together
 
-An agent can use several document collections, each with its own selected retrieval method. I worked on the configuration that records these choices and the mapping used to build the agent's tools. Each binding contains an **agent ID, collection ID and retrieval-method ID**.
+A user can give an agent several collections and choose a retrieval method for each one. I worked on the records that store those choices and the mapping that turns them into tools. Each record holds an **agent ID, a collection ID and a retrieval-method ID**.
 
 ![RAG Studio prepares documents for search. During chat, Agent Studio uses a collection tool to search the same documents and receive relevant text.](../assets/studio-connection.svg)
 
-The wrapper holds onto the collection and method while exposing a callable tool to the model. When a query arrives, it passes the query to that method for that collection. The agent runtime can use the result without implementing the retrieval algorithm itself.
+When the backend builds a tool, it binds the collection and retrieval method to the wrapper. The model supplies the query at call time; the wrapper already knows where to send it.
 
 ## Giving the model enough information to choose
 
-A tool name identifies a callable operation, but the description tells the model when it might be useful. I worked on descriptions that included the collection's purpose and information about its files. This gave the model information about the available sources before it made a retrieval call.
+The model needs to choose a source before it sees any retrieved text. I put the collection’s purpose and the names and descriptions of its files in the tool description. With two collections available, the model can use that information to decide which one to search.
 
 | Tool component | Purpose |
 | --- | --- |
@@ -24,13 +24,13 @@ A tool name identifies a callable operation, but the description tells the model
 | Query and method inputs | Supply the search request to the wrapper. |
 | Bound collection and method | Preserve the source and retrieval choices stored for the agent. |
 
-I integrated these retrieval tools with the agent's selected static tools and the LangGraph execution loop. The shared implementation later added method-specific parameter schemas and further service refactoring.
+I bound the collection tools alongside the agent’s selected static tools. The team later added input schemas for the parameters specific to each retrieval method and refactored the service.
 
 ## From a tool call to document context
 
-The model selects a tool and supplies its query. The wrapper calls the configured retrieval method, which reads from the collection's document data in RAG Studio. The returned text becomes a tool result in the conversation. The model can then use that context in its answer or make another tool call.
+During a chat, the model names a tool and supplies a query. ToolNode runs the wrapper, which passes the query and any method inputs to RAG Studio. The retrieved text comes back as a tool message, so the model can read it before answering or requesting another tool.
 
-The division of work followed the two studios:
+The RAG team implemented the searches. I connected them to agents through the following pieces:
 
 | Agent Studio — my integration | RAG Studio — retrieval team |
 | --- | --- |
