@@ -10,19 +10,21 @@ A user can give an agent several collections and choose a retrieval method for e
 
 ![RAG Studio prepares documents for search. During chat, Agent Studio uses a collection tool to search the same documents and receive relevant text.](../assets/studio-connection.svg)
 
+**Figure 1.** RAG Studio splits and embeds uploaded documents. During chat, the agent’s collection tool searches those documents using the selected retrieval method.
+
 When the backend builds a tool, it binds the collection and retrieval method to the wrapper. The model supplies the query at call time; the wrapper already knows where to send it.
 
 ## Giving the model enough information to choose
 
-The model needs to choose a source before it sees any retrieved text. I put the collection’s purpose and the names and descriptions of its files in the tool description. With two collections available, the model can use that information to decide which one to search.
+The model needs to choose a collection before it sees any retrieved text. I put the collection’s purpose and the names and descriptions of its files in the tool description. With two collections available, the model can use that information to decide which one to search.
 
 | Tool component | Purpose |
 | --- | --- |
 | Distinct name | Identifies the collection-specific operation in a tool call. |
-| Collection and file descriptions | Explain what information the source contains. |
+| Collection and file descriptions | Explain what information the collection contains. |
 | Retrieval-method description | Explains the search capability available for that source. |
 | Query and method inputs | Supply the search request to the wrapper. |
-| Bound collection and method | Preserve the source and retrieval choices stored for the agent. |
+| Bound collection and method | Keep the tool tied to the selected collection and retrieval method. |
 
 I bound the collection tools alongside the agent’s selected static tools. The team later added input schemas for the parameters specific to each retrieval method and refactored the service.
 
@@ -32,7 +34,7 @@ During a chat, the model names a tool and supplies a query. ToolNode runs the wr
 
 The RAG team implemented the searches. I connected them to agents through the following pieces:
 
-| Agent Studio — my integration | RAG Studio — retrieval team |
+| My work in Agent Studio | The RAG Studio team’s work |
 | --- | --- |
 | Store an agent's collection and method choices. | Process documents, create chunks and generate embeddings. |
 | Build and describe collection-specific tools. | Implement retrieval methods and their parameters. |

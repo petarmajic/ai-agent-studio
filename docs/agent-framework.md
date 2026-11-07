@@ -2,9 +2,11 @@
 
 [Overview](../README.md) · [RAG integration](rag-integration.md)
 
-Two agents in the same project can have different instructions, tools and document sources. I built the APIs that store those choices and worked on the LangGraph runtime that uses them when a chat starts.
+Two agents in the same project can have different instructions, tools and document collections. I built the APIs that store those choices and worked on the LangGraph runtime that uses them when a chat starts.
 
 ![The web app connects to a shared FastAPI backend for Agent Studio and RAG Studio. The backend uses OpenAI and PostgreSQL with pgvector.](../assets/platform-overview.svg)
+
+**Figure 1.** Agent Studio and RAG Studio share a FastAPI backend that calls OpenAI and stores project data in PostgreSQL.
 
 ## Data model
 
@@ -14,7 +16,7 @@ An agent belongs to one project. Its record holds the agent description and the 
 | --- | --- | --- |
 | **Project** | Name and description. | Groups agents and document collections. |
 | **Agent** | Name, description, selected tools, project reference and rating fields. | Belongs to a project and has collection configurations. |
-| **Agent–collection configuration** | Agent ID, collection ID and retrieval-method ID. | Associates a document source with the method selected for that agent. |
+| **Agent–collection configuration** | Agent ID, collection ID and retrieval-method ID. | Records how this agent searches this collection. |
 | **Collection** | Description, files, chunking and embedding settings. | Provides document context through RAG Studio. |
 
 I wrote the project and agent routes, their request and response schemas, and the database operations behind them. I later refactored the models and configuration routes. One detail mattered when editing an agent: if a user changed the search method for an existing collection, the update had to change that binding; if they removed the collection, it had to remove the binding too.
@@ -29,7 +31,7 @@ The LangGraph loop has two nodes. The model reads the messages and produces eith
 
 | Part | Responsibility |
 | --- | --- |
-| Agent configuration | Determines the instructions, tools and document sources available to the agent. |
+| Agent configuration | Determines the instructions, tools and document collections available to the agent. |
 | Model node | Reads the messages and produces an answer or tool calls. |
 | ToolNode | Executes the requested tools and returns their results to the conversation. |
 | Chat API | Supplies request history, runs the graph and returns the answer. |
