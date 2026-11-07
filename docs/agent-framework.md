@@ -38,9 +38,17 @@ I also worked on chat handling. The client sends the conversation history with e
 
 ## Tool interface
 
-Each static tool has a name, a description and an operation the backend can run. A LangChain adapter makes it callable by the agent. I worked on that interface, integrated the weather tool and added the route for listing available tools. Other team members built the Jira, SMTP email and public-holiday tools.
+I built `GET /tools` so the configuration screen could list each available tool by ID, name and description. When a chat starts, the backend looks up the tools selected for that agent and binds their LangChain adapters to the model.
 
-The backend exposes only the tools selected for the current agent. A weather request and a document search do different work, but both return their results through ToolNode.
+I implemented the weather tool. If a user asks “What’s the weather in Zagreb?”, the model can call it with the city name. The tool looks up the first matching place in Open-Meteo, then requests current conditions using its coordinates and time zone. It returns the temperature in °C and wind speed in km/h. If the place lookup fails, the tool returns a message explaining that it could not resolve the location.
+
+The team used the same interface for three other tools.
+
+| Tool | What the agent can do |
+| --- | --- |
+| Jira Cloud | Create an issue in the configured project. On success, Jira returns an issue key and the tool builds a link to the ticket. |
+| Email | Send a message to specified recipients through a configured SMTP server, including Gmail SMTP. The tool returns the recipient list and subject after sending. |
+| Croatian public holidays | Look up holidays or long weekends through Nager.Date. If there are no upcoming holidays left this year, the upcoming-holidays lookup checks the following year. |
 
 ## API responsibilities
 
